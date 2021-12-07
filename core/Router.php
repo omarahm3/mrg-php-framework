@@ -16,7 +16,14 @@ class Router
 
   public function get(string $path, $callback): void
   {
-    $this->routes['get'][$path] = $callback;
+    $method = explode('::', __METHOD__)[1];
+    $this->routes[$method][$path] = $callback;
+  }
+
+  public function post(string $path, $callback): void
+  {
+    $method = explode('::', __METHOD__)[1];
+    $this->routes[$method][$path] = $callback;
   }
 
   public function resolve()
@@ -34,13 +41,13 @@ class Router
       return $this->renderView($callback);
     }
 
-    return $callback();
+    return call_user_func($callback);
   }
 
-  public function renderView(string $view)
+  public function renderView(string $view, array $params = null)
   {
     $layoutContent = $this->layoutContent();
-    $viewContent = $this->renderOnlyView($view);
+    $viewContent = $this->renderOnlyView($view, $params);
     return str_replace('{{content}}', $viewContent, $layoutContent);
   }
 
@@ -57,8 +64,12 @@ class Router
     return ob_get_clean();
   }
 
-  protected function renderOnlyView(string $view)
+  protected function renderOnlyView(string $view, array $params = null)
   {
+    foreach($params as $key => $value) {
+      $$key = $value;
+    }
+
     // Here start capturing the output buffer instead of outputing it directly into the page
     ob_start();
     include_once Application::$ROOT_DIR."/views/$view.php";
