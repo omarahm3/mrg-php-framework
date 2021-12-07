@@ -1,0 +1,15 @@
+{
+    "name": "mrgeek/mrg-framework",
+    "authors": [
+        {
+            "name": "Omar Ahmed",
+            "email": "omarking05@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "app\\": "."
+        }
+    },
+    "require": {}
+}
