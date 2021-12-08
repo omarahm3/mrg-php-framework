@@ -2,9 +2,10 @@
 
 namespace app\controllers;
 
+use app\core\Controller;
 use app\core\Request;
 
-class SiteController extends BaseController
+class SiteController extends Controller
 {
   public function showHome()
   {

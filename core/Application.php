@@ -2,8 +2,6 @@
 
 namespace app\core;
 
-use app\controllers\BaseController;
-
 class Application
 {
   public static string $ROOT_DIR;
@@ -11,7 +9,7 @@ class Application
   public Router $router;
   public Request $request;
   public Response $response;
-  public BaseController $controller;
+  public Controller $controller;
 
   public function __construct($rootPath)
   {

@@ -1,10 +1,8 @@
 <?php
 
-namespace app\controllers;
+namespace app\core;
 
-use app\core\Application;
-
-class BaseController
+class Controller
 {
   public string $layout = 'main';
 
