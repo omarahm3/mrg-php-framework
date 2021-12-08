@@ -92,4 +92,14 @@ abstract class Model implements ModelInterface
       self::RULE_MATCH => 'This field must be the same as {match}',
     ];
   }
+
+  public function hasError($attribute): bool
+  {
+    return isset($this->errors[$attribute]) && count($this->errors[$attribute]) > 0;
+  }
+
+  public function getFirstError($attribute)
+  {
+    return $this->errors[$attribute][0] ?? false;
+  }
 }

@@ -1,32 +1,59 @@
 <h1>Register</h1>
 
-<form method="POST" action="/register">
-  <div class="row">
+<?php $form = \app\core\form\Form::begin('', 'post') ?>
+<div class="row">
     <div class="col">
-      <div class="mb-3">
-        <label class="form-label">First Name</label>
-        <input type="text" class="form-control" name="firstname">
-      </div>
+      <?php
+      echo $form
+        ->field($model, 'firstname')
+        ->mainClass('mb-3')
+        ->labelClass('form-labell')
+        ->labelContent('First Name')
+        ->inputClass('form-control')
+        ->inputName('firstname')
+      ?>
     </div>
-
     <div class="col">
-      <div class="mb-3">
-        <label class="form-label">Last Name</label>
-        <input type="text" class="form-control" name="lastname">
-      </div>
+      <?php
+      echo $form
+        ->field($model, 'lastname')
+        ->mainClass('mb-3')
+        ->labelClass('form-labell')
+        ->labelContent('Last Name')
+        ->inputClass('form-control')
+        ->inputName('lastname')
+      ?>
     </div>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Email</label>
-    <input type="email" class="form-control" name="email">
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Password</label>
-    <input type="password" class="form-control" name="password">
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Confirm Password</label>
-    <input type="password" class="form-control" name="confirmPassword">
-  </div>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+</div>
+<?php
+echo $form
+  ->field($model, 'email')
+  ->mainClass('mb-3')
+  ->labelClass('form-labell')
+  ->labelContent('Email')
+  ->inputClass('form-control')
+  ->email()
+  ->inputName('email')
+?>
+<?php
+echo $form
+  ->field($model, 'password')
+  ->mainClass('mb-3')
+  ->labelClass('form-labell')
+  ->labelContent('Password')
+  ->inputClass('form-control')
+  ->password()
+  ->inputName('password')
+?>
+<?php
+echo $form
+  ->field($model, 'confirmPassword')
+  ->mainClass('mb-3')
+  ->labelClass('form-labell')
+  ->labelContent('Confirm Password')
+  ->inputClass('form-control')
+  ->password()
+  ->inputName('confirmPassword')
+?>
+<button type="submit" class="btn btn-primary">Submit</button>
+<?php \app\core\form\Form::end() ?>
