@@ -13,6 +13,7 @@ class AuthController extends BaseController
    */
   public function login()
   {
+    $this->setLayout('auth');
     return $this->render('login');
   }
   
@@ -24,6 +25,7 @@ class AuthController extends BaseController
   public function register(Request $request)
   {
     if ($request->isGet()) {
+      $this->setLayout('auth');
       return $this->render('register');
     }
 
