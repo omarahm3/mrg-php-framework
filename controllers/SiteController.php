@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\core\Application;
+use app\core\Request;
 
 class SiteController extends BaseController
 {
@@ -20,9 +21,9 @@ class SiteController extends BaseController
     return $this->render('contact');
   }
 
-  public function handleContact()
+  public function handleContact(Request $request)
   {
-    $body = Application::$app->request->getBody();
+    $body = $request->getBody();
     echo "<pre>";
     var_dump($body);
     echo "</pre>";
