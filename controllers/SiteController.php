@@ -2,7 +2,6 @@
 
 namespace app\controllers;
 
-use app\core\Application;
 use app\core\Request;
 
 class SiteController extends BaseController

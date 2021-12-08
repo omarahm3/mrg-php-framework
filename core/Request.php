@@ -21,6 +21,16 @@ class Request
     return strtolower($_SERVER['REQUEST_METHOD']);
   }
 
+  public function isGet(): bool
+  {
+    return $this->getMethod() === 'get';
+  }
+
+  public function isPost(): bool
+  {
+    return $this->getMethod() === 'post';
+  }
+
   private function sanitizeInputValue(string $value, int $type): ?string
   {
     return filter_input($type, $value, FILTER_SANITIZE_SPECIAL_CHARS);
