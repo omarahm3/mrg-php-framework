@@ -21,8 +21,21 @@ class Request
     return strtolower($_SERVER['REQUEST_METHOD']);
   }
 
+  private function sanitizeInputValue(string $value, int $type): ?string
+  {
+    return filter_input($type, $value, FILTER_SANITIZE_SPECIAL_CHARS);
+  }
+
   public function getBody()
   {
+    $body = [];
+    $params = $this->getMethod() === 'get' ? $_GET : $_POST;
+    $methodType = $this->getMethod() === 'get' ? INPUT_GET : INPUT_POST;
 
+    foreach ($params as $key => $value) {
+      $body[$key] = $this->sanitizeInputValue($key, $methodType);
+    }
+
+    return $body;
   }
 }

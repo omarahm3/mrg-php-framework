@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\core\Application;
+
 class SiteController extends BaseController
 {
   public function showHome()
@@ -20,6 +22,12 @@ class SiteController extends BaseController
 
   public function handleContact()
   {
+    $body = Application::$app->request->getBody();
+    echo "<pre>";
+    var_dump($body);
+    echo "</pre>";
+    exit();
+    
     return 'Handle submitted data';
   }
 }
