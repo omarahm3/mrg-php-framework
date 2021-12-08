@@ -6,26 +6,19 @@ use app\core\Request;
 
 class AuthController extends BaseController
 {
-  /**
-   * undocumented function
-   *
-   * @return void
-   */
-  public function login()
+  public function __construct()
   {
     $this->setLayout('auth');
+  }
+  
+  public function login()
+  {
     return $this->render('login');
   }
   
-  /**
-   * undocumented function
-   *
-   * @return void
-   */
   public function register(Request $request)
   {
     if ($request->isGet()) {
-      $this->setLayout('auth');
       return $this->render('register');
     }
 
