@@ -2,8 +2,10 @@
 
 namespace app\controllers;
 
+use app\core\Application;
 use app\core\Controller;
 use app\core\Request;
+use app\core\Response;
 use app\models\User;
 
 class AuthController extends Controller
@@ -18,7 +20,7 @@ class AuthController extends Controller
     return $this->render('login');
   }
 
-  public function register(Request $request)
+  public function register(Request $request, Response $response)
   {
     $user = new User();
 
@@ -31,7 +33,8 @@ class AuthController extends Controller
     $user->loadData($request->getBody());
 
     if ($user->validate() && $user->save()) {
-      return 'Success';
+      Application::$app->session->setFlash('success', 'Thanks for registering');
+      return $response->redirect('/');
     }
 
     return $this->render('register', [
