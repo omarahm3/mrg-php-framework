@@ -2,6 +2,8 @@
 
 namespace app\core;
 
+use Exception;
+
 abstract class Model implements ModelInterface
 {
   public const RULE_REQUIRED = 'required';
@@ -9,6 +11,7 @@ abstract class Model implements ModelInterface
   public const RULE_MIN_LENGTH = 'min_length';
   public const RULE_MAX_LENGTH = 'max_length';
   public const RULE_MATCH = 'match';
+  public const RULE_UNIQUE = 'unique';
 
   public array $errors = [];
 
@@ -17,7 +20,7 @@ abstract class Model implements ModelInterface
   public function loadData(array $data): void
   {
     foreach ($data as $key => $value) {
-     if (property_exists($this, $key)) {
+      if (property_exists($this, $key)) {
         $this->{$key} = $value;
       }
     }
@@ -43,15 +46,15 @@ abstract class Model implements ModelInterface
         }
 
         if ($ruleName === self::RULE_MIN_LENGTH && !isset($rule['value'])) {
-          throw new \Exception(sprintf('[%s] Must have a "value" property', self::RULE_MIN_LENGTH));
+          throw new Exception(sprintf('[%s] Must have a "value" property', self::RULE_MIN_LENGTH));
         }
 
         if ($ruleName === self::RULE_MAX_LENGTH && !isset($rule['value'])) {
-          throw new \Exception(sprintf('[%s] Must have a "value" property', self::RULE_MAX_LENGTH));
+          throw new Exception(sprintf('[%s] Must have a "value" property', self::RULE_MAX_LENGTH));
         }
 
         if ($ruleName === self::RULE_MATCH && !isset($rule['match'])) {
-          throw new \Exception(sprintf('[%s] Must have a "value" property', self::RULE_MAX_LENGTH));
+          throw new Exception(sprintf('[%s] Must have a "value" property', self::RULE_MAX_LENGTH));
         }
 
         if ($ruleName === self::RULE_MIN_LENGTH && strlen($value) < $rule['value']) {
@@ -64,6 +67,26 @@ abstract class Model implements ModelInterface
 
         if ($ruleName === self::RULE_MATCH && $value !== $this->{$rule['match']}) {
           $this->addError($attribute, self::RULE_MATCH, $rule);
+        }
+
+        if ($ruleName === self::RULE_UNIQUE) {
+          $className = $rule['class'];
+
+          if (!isset($className)) {
+            throw new Exception(sprintf('[%s] Must have a "class" property', self::RULE_UNIQUE));
+          }
+
+          $uniqueAttribute = $rule['attribute'] ?? $attribute;
+          $tableName = $className::tableName();
+
+          $statement = Application::$app->db->prepare("SELECT * FROM $tableName WHERE $uniqueAttribute = :attr");
+          $statement->bindValue(':attr', $value);
+          $statement->execute();
+          $record = $statement->fetchObject();
+
+          if ($record) {
+            $this->addError($attribute, self::RULE_UNIQUE, ['field' => $attribute]);
+          }
         }
       }
     }
@@ -90,6 +113,7 @@ abstract class Model implements ModelInterface
       self::RULE_MIN_LENGTH => 'Minimum length must be {value}',
       self::RULE_MAX_LENGTH => 'Maximum length must be {value}',
       self::RULE_MATCH => 'This field must be the same as {match}',
+      self::RULE_UNIQUE => 'Record with this {field} already exists',
     ];
   }
 

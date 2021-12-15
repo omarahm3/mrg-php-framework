@@ -42,7 +42,7 @@ class Database
     $appliedMigrations = $this->getAppliedMigrations();
 
     $migrations = [];
-    $files = scandir(Application::$ROOT_DIR.'/migrations');
+    $files = scandir(Application::$ROOT_DIR . '/migrations');
     $toApplyMigrations = array_diff($files, $appliedMigrations);
 
     foreach ($toApplyMigrations as $migration) {
@@ -50,28 +50,34 @@ class Database
         continue;
       }
 
-      require_once Application::$ROOT_DIR.'/migrations/'.$migration;
+      require_once Application::$ROOT_DIR . '/migrations/' . $migration;
 
       $className = pathinfo($migration, PATHINFO_FILENAME);
       $instance = new $className();
 
-      echo "Applying migration [$migration]".PHP_EOL;
+      echo "Applying migration [$migration]" . PHP_EOL;
       $instance->up();
-      echo "Finished applying migration [$migration]".PHP_EOL;
+      echo "Finished applying migration [$migration]" . PHP_EOL;
       $migrations[] = $migration;
     }
 
     if (!empty($migrations)) {
       $this->saveMigrations($migrations);
     } else {
-      echo "All migrations are already applied".PHP_EOL;
+      echo "All migrations are already applied" . PHP_EOL;
     }
   }
 
   private function saveMigrations(array $migrations)
   {
-    $migrationsString = implode(',', array_map(fn($migration) => "('$migration')", $migrations));
+    $migrationsString = implode(',', array_map(fn ($migration) => "('$migration')", $migrations));
     $query = $this->pdo->prepare("INSERT INTO migrations (migration) VALUES ($migrationsString)");
     $query->execute();
   }
+
+  public function prepare($sql)
+  {
+    return $this->pdo->prepare($sql);
+  }
 }
+
