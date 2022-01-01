@@ -40,8 +40,10 @@ class Router
    *    - If the callback is a 'string', then resolve function will expect a view file
    *    - If the callback is 'array', then resolve function will expect a controller and it will call this method
    *    - If the callback is a 'function', then resolve function will just call this function
+   * 
+   * @return string
    */
-  public function resolve()
+  public function resolve(): string
   {
     $path = $this->request->getPath();
     $method = $this->request->getMethod();
