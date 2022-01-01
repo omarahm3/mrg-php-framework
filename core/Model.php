@@ -15,8 +15,36 @@ abstract class Model implements ModelInterface
 
   public array $errors = [];
 
+  /**
+   * Will return validation rules of the Model
+   * It is used to validate each of the model attributes
+   *
+   * Rules example:
+   *   [
+   *     'password' =>
+   *     [
+   *       self::RULE_REQUIRED,
+   *       [
+   *         self::RULE_MIN_LENGTH,
+   *         'value' => 8
+   *       ],
+   *       [
+   *         self::RULE_MAX_LENGTH,
+   *         'value' => 16
+   *       ]
+   *     ]
+   *   ]
+   *
+   * @return array
+   */
   abstract public function rules(): array;
 
+  /**
+   * This will use passed $data to assign it to each property of the model instance
+   * Data passed must be an associative array with keys exactly the same as model's properties
+   *
+   * @param array $data
+   */
   public function loadData(array $data): void
   {
     foreach ($data as $key => $value) {
@@ -26,23 +54,30 @@ abstract class Model implements ModelInterface
     }
   }
 
+  /**
+   * Will handle validating model's data according to model's predefined rules
+   *
+   * TODO: There so much crap and if conditions in this method, it will be better to refactor the whole model validation part
+   *
+   * @return bool
+   */
   public function validate(): bool
   {
-    foreach ($this->rules() as $attribute => $rules) {
-      $value = $this->{$attribute};
+    foreach ($this->rules() as $propertyName => $rules) {
+      $value = $this->{$propertyName};
       foreach ($rules as $rule) {
         $ruleName = $rule;
 
-        if (is_array($ruleName)) {
-          $ruleName = $ruleName[0];
+        if (is_array($rule)) {
+          $ruleName = $rule[0];
         }
 
         if ($ruleName === self::RULE_REQUIRED && !$value) {
-          $this->addError($attribute, self::RULE_REQUIRED);
+          $this->addError($propertyName, self::RULE_REQUIRED);
         }
 
         if ($ruleName === self::RULE_EMAIL && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
-          $this->addError($attribute, self::RULE_EMAIL);
+          $this->addError($propertyName, self::RULE_EMAIL);
         }
 
         if ($ruleName === self::RULE_MIN_LENGTH && !isset($rule['value'])) {
@@ -58,17 +93,18 @@ abstract class Model implements ModelInterface
         }
 
         if ($ruleName === self::RULE_MIN_LENGTH && strlen($value) < $rule['value']) {
-          $this->addError($attribute, self::RULE_MIN_LENGTH, $rule);
+          $this->addError($propertyName, self::RULE_MIN_LENGTH, $rule);
         }
 
         if ($ruleName === self::RULE_MAX_LENGTH && strlen($value) > $rule['value']) {
-          $this->addError($attribute, self::RULE_MAX_LENGTH, $rule);
+          $this->addError($propertyName, self::RULE_MAX_LENGTH, $rule);
         }
 
         if ($ruleName === self::RULE_MATCH && $value !== $this->{$rule['match']}) {
-          $this->addError($attribute, self::RULE_MATCH, $rule);
+          $this->addError($propertyName, self::RULE_MATCH, $rule);
         }
 
+        // TODO example of why should we handle the whole validation better
         if ($ruleName === self::RULE_UNIQUE) {
           $className = $rule['class'];
 
@@ -76,16 +112,16 @@ abstract class Model implements ModelInterface
             throw new Exception(sprintf('[%s] Must have a "class" property', self::RULE_UNIQUE));
           }
 
-          $uniqueAttribute = $rule['attribute'] ?? $attribute;
+          $uniqueProperty = $rule['attribute'] ?? $propertyName;
           $tableName = $className::tableName();
 
-          $statement = Application::$app->db->prepare("SELECT * FROM $tableName WHERE $uniqueAttribute = :attr");
-          $statement->bindValue(':attr', $value);
+          $statement = Application::$app->db->prepare("SELECT * FROM $tableName WHERE $uniqueProperty = :property");
+          $statement->bindValue(':property', $value);
           $statement->execute();
           $record = $statement->fetchObject();
 
           if ($record) {
-            $this->addError($attribute, self::RULE_UNIQUE, ['field' => $attribute]);
+            $this->addError($propertyName, self::RULE_UNIQUE, ['field' => $propertyName]);
           }
         }
       }
@@ -94,7 +130,7 @@ abstract class Model implements ModelInterface
     return empty($this->errors);
   }
 
-  public function addError(string $attribute, string $rule, array $params = []): void
+  public function addError(string $propertyName, string $rule, array $params = []): void
   {
     $message = $this->errorMessages()[$rule] ?? '';
 
@@ -102,7 +138,7 @@ abstract class Model implements ModelInterface
       $message = str_replace(sprintf('{%s}', $key), $value, $message);
     }
 
-    $this->errors[$attribute][] = $message;
+    $this->errors[$propertyName][] = $message;
   }
 
   public function errorMessages(): array
@@ -117,13 +153,13 @@ abstract class Model implements ModelInterface
     ];
   }
 
-  public function hasError($attribute): bool
+  public function hasError($propertyName): bool
   {
-    return isset($this->errors[$attribute]) && count($this->errors[$attribute]) > 0;
+    return isset($this->errors[$propertyName]) && count($this->errors[$propertyName]) > 0;
   }
 
-  public function getFirstError($attribute)
+  public function getFirstError($propertyName)
   {
-    return $this->errors[$attribute][0] ?? false;
+    return $this->errors[$propertyName][0] ?? false;
   }
 }
