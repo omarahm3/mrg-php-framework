@@ -2,9 +2,17 @@
 
 namespace app\core;
 
+/**
+ * @class Request
+ */
 class Request
 {
-  public function getPath()
+  /**
+   * Will parse current route and return the endpoint
+   *
+   * @return string
+   */
+  public function getPath(): string
   {
     $path = $_SERVER['REQUEST_URI'] ?? '/';
     $position = strpos($path, '?');
@@ -31,11 +39,19 @@ class Request
     return $this->getMethod() === 'post';
   }
 
+  /**
+   * Not the best way to handle XSS attacks, but this to at least sanitize input fields
+   */
   private function sanitizeInputValue(string $value, int $type): ?string
   {
     return filter_input($type, $value, FILTER_SANITIZE_SPECIAL_CHARS);
   }
 
+  /**
+   * Will parse and return POST/GET body params
+   *
+   * @return array
+   */
   public function getBody()
   {
     $body = [];

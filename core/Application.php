@@ -2,6 +2,11 @@
 
 namespace app\core;
 
+/**
+ * The core instance of the app, where we have access to everything
+ *
+ * @class Application
+ */
 class Application
 {
   public static string $ROOT_DIR;
@@ -13,7 +18,7 @@ class Application
   public Controller $controller;
   public Database $db;
 
-  public function __construct($rootPath, array $config)
+  public function __construct(string $rootPath, array $config)
   {
     self::$ROOT_DIR = $rootPath;
     self::$app = $this;
@@ -24,6 +29,9 @@ class Application
     $this->db = new Database($config['db']);
   }
 
+  /**
+   * This is responsible for spinning up the whole application, by just resolving the routes
+   */
   public function run(): void
   {
     echo $this->router->resolve();

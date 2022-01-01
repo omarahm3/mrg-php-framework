@@ -4,6 +4,11 @@ namespace app\core\form;
 
 use app\core\Model;
 
+/**
+ * This represent form field instance where its customizable directly through view files
+ *
+ * @class Field
+ */
 class Field
 {
   private const PLACEHOLDER_MAIN_CLASS = '{main_class}';
@@ -15,7 +20,7 @@ class Field
   private const PLACEHOLDER_INPUT_VALUE = '{input_value}';
 
   public Model $model;
-  public string $attribute;
+  public string $propertyName;
 
   private array $mainClass = [];
   private array $labelClass = [];
@@ -24,12 +29,18 @@ class Field
   private string $inputType = 'text';
   private string $inputName = '';
 
-  public function __construct(Model $model, string $attribute)
+  public function __construct(Model $model, string $propertyName)
   {
     $this->model = $model;
-    $this->attribute = $attribute;
+    $this->propertyName = $propertyName;
   }
 
+  /**
+   * Will return a template of a Bootstrap form field
+   * By inserting some placeholders into the HTML string
+   *
+   * @return string
+   */
   private function template(): string
   {
     return sprintf('
@@ -46,15 +57,20 @@ class Field
       self::PLACEHOLDER_INPUT_CLASS,
       self::PLACEHOLDER_INPUT_NAME,
       self::PLACEHOLDER_INPUT_VALUE,
-      $this->model->getFirstError($this->attribute)
+      $this->model->getFirstError($this->propertyName)
     );
   }
 
+  /**
+   * Will return a ready to render HTML string after parsing the template
+   *
+   * @return string
+   */
   private function render(): string
   {
     $html = $this->template();
 
-    if ($this->model->hasError($this->attribute)) {
+    if ($this->model->hasError($this->propertyName)) {
       $this->inputClass[] = ' is-invalid';
     }
 
@@ -75,11 +91,16 @@ class Field
         $this->labelContent,
         $this->inputType,
         $this->inputName,
-        $this->model->{$this->attribute},
+        $this->model->{$this->propertyName},
       ], $html);
   }
 
-  public function __toString()
+  /**
+   * Will handle rendering the actual Field instance by calling self::render method
+   *
+   * @return string
+   */
+  public function __toString(): string
   {
     return $this->render();
   }

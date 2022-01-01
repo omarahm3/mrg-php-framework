@@ -2,6 +2,11 @@
 
 namespace app\core;
 
+/**
+ * Responsible for connecting to MySQL database and handle DB migrations
+ *
+ * @class Application
+ */
 class Database
 {
   public \PDO $pdo;
@@ -26,6 +31,8 @@ class Database
   }
 
   /**
+   * Get already applied migrations
+   *
    * @return array|false
    */
   private function getAppliedMigrations()
@@ -36,6 +43,9 @@ class Database
     return $query->fetchAll(\PDO::FETCH_COLUMN);
   }
 
+  /**
+   * This will handle applying migrations under './migrations' directory
+   */
   public function applyMigrations(): void
   {
     $this->createMigrationsTable();

@@ -32,6 +32,11 @@ class User extends DbModel
     return ['firstname', 'lastname', 'email', 'password', 'status'];
   }
 
+  /**
+   * Here we override parent::save method just to hash user password before inserting data into DB
+   *
+   * @return bool
+   */
   public function save(): bool
   {
     $this->password = password_hash($this->password, PASSWORD_DEFAULT);
