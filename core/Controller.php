@@ -11,6 +11,12 @@ class Controller
     $this->layout = $layout;
   }
   
+  /**
+   * Wrapper around Router::renderView method
+   *
+   * @param string $view
+   * @param array|null $params
+   */
   public function render(string $view, array $params = [])
   {
     return Application::$app->router->renderView($view, $params);

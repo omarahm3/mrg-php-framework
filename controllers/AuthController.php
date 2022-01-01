@@ -20,10 +20,18 @@ class AuthController extends Controller
     return $this->render('login');
   }
 
+  /**
+   * Handle both register GET/POST
+   *
+   * @param Request $request
+   * @param Response $response
+   */
   public function register(Request $request, Response $response)
   {
     $user = new User();
 
+    // In case we want to render the register view only
+    // We also pass User model to render user fields in case there are some validations errors
     if ($request->isGet()) {
       return $this->render('register', [
         'model' => $user,
