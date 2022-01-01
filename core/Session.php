@@ -2,6 +2,9 @@
 
 namespace app\core;
 
+/**
+ * @class Session
+ */
 class Session
 {
   protected const FLASH_KEY = 'flash_messages'; 
@@ -9,12 +12,15 @@ class Session
   public function __construct()
   {
     session_start();
+    // Get all flash messages from session
     $flashMessages = $_SESSION[self::FLASH_KEY] ?? [];
 
+    // Mark all flash messages to be removed
     foreach ($flashMessages as $key => &$flashMessage) {
       $flashMessage['remove'] = true;
     }
 
+    // Save flash messages to session
     $_SESSION[self::FLASH_KEY] = $flashMessages;
   }
 
@@ -22,6 +28,7 @@ class Session
   {
     $flashMessages = $_SESSION[self::FLASH_KEY] ?? [];
 
+    // Remove all marked removed flash messages
     foreach ($flashMessages as $key => &$flashMessage) {
       if ($flashMessage['remove']) {
         unset($flashMessages[$key]);
